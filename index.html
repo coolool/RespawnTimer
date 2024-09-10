@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 20%;
+        }
+
+        #timer {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            background-color: green;
+            color: white;
+            animation: flash 1s step-start infinite;
+        }
+
+        @keyframes flash {
+            50% { background-color: green; }
+            100% { background-color: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">00:00</div>
+    <input type="number" id="timeInput" placeholder="Enter seconds for timer" />
+    <input type="number" id="flashInput" placeholder="Enter seconds for flashing" />
+    <button onclick="startTimer()">Start Timer</button>
+    <script>
+        let timer;
+        let timeLeft;
+        let originalTime;
+        let flashDuration;
+        let isFlashing = false;
+
+        function startTimer() {
+            clearInterval(timer);
+
+            const timerInput = document.getElementById('timeInput').value;
+            const flashInput = document.getElementById('flashInput').value;
+
+            if (isNaN(timerInput) || timerInput <= 0 || isNaN(flashInput) || flashInput <= 0) {
+                alert("Please enter valid numbers greater than 0.");
+                return;
+            }
+
+            originalTime = parseInt(timerInput);
+            flashDuration = parseInt(flashInput) * 1000; // Convert to milliseconds
+            timeLeft = originalTime;
+            updateDisplay();
+
+            timer = setInterval(() => {
+                if (!isFlashing) {
+                    timeLeft--;
+                    updateDisplay();
+
+                    if (timeLeft <= 0) {
+                        startFlashing();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startFlashing() {
+            isFlashing = true;
+            document.body.classList.add('flash');
+
+            setTimeout(() => {
+                document.body.classList.remove('flash');
+                timeLeft = originalTime; // Reset timer
+                updateDisplay();
+                isFlashing = false;
+            }, flashDuration); // Custom flash duration
+        }
+    </script>
+</body>
+</html>
